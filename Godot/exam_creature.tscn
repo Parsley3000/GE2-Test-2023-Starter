@@ -161,13 +161,13 @@ material/0 = ExtResource( 9 )
 shape = SubResource( 10 )
 disabled = true
 
-[node name="Dodecahedron" parent="creature" instance=ExtResource( 6 )]
+[node name="pod" parent="creature" instance=ExtResource( 6 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14.8223 )
 
-[node name="Area" type="Area" parent="creature/Dodecahedron"]
+[node name="Area" type="Area" parent="creature/pod"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.8223 )
 
-[node name="CollisionShape" type="CollisionShape" parent="creature/Dodecahedron/Area"]
+[node name="CollisionShape" type="CollisionShape" parent="creature/pod/Area"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0412713, 0, 14.8223 )
 shape = SubResource( 17 )
 
@@ -209,6 +209,6 @@ radius = 30
 
 [node name="SceneSwitcher" parent="." instance=ExtResource( 17 )]
 
-[connection signal="body_entered" from="creature/Dodecahedron/Area" to="creature" method="_on_Area_body_entered"]
+[connection signal="body_entered" from="creature/pod/Area" to="creature" method="_on_Area_body_entered"]
 
-[editable path="creature/Dodecahedron"]
+[editable path="creature/pod"]
