@@ -21,7 +21,9 @@ func _ready():
 	connect("player_entered_pod", self, "_on_player_entered_pod")
 
 func _input(event):
-	if event.is_action_pressed("ui_cancel"):
+	#If z is pressed stop following player
+	#added Stop_follow to key bindings
+	if event.is_action_pressed("stop_follow"):
 		is_in_pod = false
 
 func _on_Area_body_entered(body):
@@ -79,7 +81,7 @@ func _physics_process(delta):
 		var target_position = player.global_transform.origin + initial_offset
 		global_transform.origin = global_transform.origin.linear_interpolate(target_position, 0.1)
 
-		# Rotate creature to face the same direction as the player using slerp
+		#Rotate creature to face the same direction as the player using slerp
 		var target_rotation = player.global_transform.basis.orthonormalized()
 		global_transform.basis = global_transform.basis.slerp(target_rotation, 0.1)
 
