@@ -1,51 +1,82 @@
 extends Spatial
 
-# Variables for nodes
+#Cache references to player, pod, and player_camera nodes
 onready var player = $"../Player"
-onready var pod = $Pod
-onready var camera = $"../Player/Camera"
+onready var pod = $"Pod"
+onready var player_camera = $"../Player/Camera"
 
-# Flag for whether the player has entered the pod
-var player_enter_pod = false
+var initial_offset
+var target_transform
 
-#Flag for when the player is in position above pod
-var player_in_pod = false
+#Variable to track if the player is inside the pod
+var is_in_pod = false
 
-# Movement speed for smooth transition moving player over to pod
-var move_speed = 5.0
+#Signal that gets emitted when the player enters the pod
+signal player_entered_pod
 
-# Camera offset to move out of first person, into third person
-var camera_offset = Vector3(0, 2, -4)
+func _ready():
+	#Calculate the initial offset between the creature and the player
+	initial_offset = global_transform.origin - player.global_transform.origin
+	# Connect to the player_entered_pod signal
+	connect("player_entered_pod", self, "_on_player_entered_pod")
 
-# Signal from the pod
 func _on_Area_body_entered(body):
-	#if the body that entered is the player
+	#Check if the entered body is the player
 	if body == player:
-		#set position of player just a
-		player.global_transform.origin = player.global_transform.origin.linear_interpolate(pod.global_transform.origin + Vector3(0, 1, 0))
-		# Set the flag to start following the player
-		player_enter_pod = true
+		# Set the target_transform to be the creature's current transform and move it up by 1 unit
+		target_transform = global_transform
+		target_transform.origin.y += 1
+		# Emit the player_entered_pod signal
+		emit_signal("player_entered_pod")
 
-func _process(delta):
-	if player_enter_pod:
-		#set position of player just a
-		player.global_transform.origin = player.global_transform.origin.linear_interpolate(pod.global_transform.origin + Vector3(0, 1, 0))
-		
-	if (player.global_transform.origin) == (pod.global_transform.origin + Vector3(0, 1, 0)):
-		var player_in_pod = true
-		
-		
-	if player_in_pod:
-		# Update the camera's position relative to the player
-		camera.global_transform.origin = player.global_transform.origin + camera_offset
+func _on_player_entered_pod():
+	#Perform each action once the previous action is completed
+	yield(move_player_to_target(), "completed")
+	yield(rotate_player_to_target(), "completed")
+	yield(move_camera_to_target(), "completed")
 
-		# Update the creature's transform to match the player's transform
-		var target_transform = player.global_transform
-		global_transform = target_transform
+	#Mark the player as being inside the pod
+	is_in_pod = true
 
-		# Apply rotation as well
-		rotation = player.rotation
+#Move the player smoothly to the target_transform position
+func move_player_to_target():
+	var t = 0.0
+	while t < 1.0:
+		t += 0.01
+		player.global_transform = player.global_transform.interpolate_with(target_transform, t)
+		yield(get_tree().create_timer(0.016), "timeout")
+	return "completed"
 
+#Rotate the player smoothly to match the creature y rotation
+func rotate_player_to_target():
+	var creature_angle = global_transform.basis.get_euler().y
+	var player_angle = player.global_transform.basis.get_euler().y
+	var angle_diff = creature_angle - player_angle
+
+	while abs(angle_diff) > 0.001:
+		var rotation_speed = 0.01 * sign(angle_diff)
+		player.rotate_y(rotation_speed)
+		player_angle += rotation_speed
+		angle_diff = creature_angle - player_angle
+		yield(get_tree().create_timer(0.016), "timeout")
+	return "completed"
+
+#Move the camera smoothly to a position above and behind the player
+func move_camera_to_target():
+	var target_camera_pos = player.global_transform.origin + Vector3(0, 2, -5)
+	var t = 0.0
+	while t < 1.0:
+		t += 0.01
+		player_camera.global_transform.origin = player_camera.global_transform.origin.linear_interpolate(target_camera_pos, t)
+		yield(get_tree().create_timer(0.016), "timeout")
+	return "completed"
+
+#Follow the player while maintaining the initial offset, and make the creature look at the player
+func _physics_process(delta):
+	if is_in_pod:
+		var target_position = player.global_transform.origin + initial_offset
+		global_transform.origin = global_transform.origin.linear_interpolate(target_position, 0.1)
+		look_at(player.global_transform.origin, Vector3.UP)
 
 
 

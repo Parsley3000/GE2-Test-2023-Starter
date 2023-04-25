@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://FollowPath.gd" type="Script" id=1]
 [ext_resource path="res://SpineAnimator.gd" type="Script" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://Tank Material.tres" type="Material" id=9]
 [ext_resource path="res://Harmonic.gd" type="Script" id=10]
 [ext_resource path="res://Boid.gd" type="Script" id=11]
+[ext_resource path="res://Models/Dodecahedron.gd" type="Script" id=12]
 [ext_resource path="res://FPController.gd" type="Script" id=13]
 [ext_resource path="res://root.gd" type="Script" id=14]
 [ext_resource path="res://Obstacles.gd" type="Script" id=15]
@@ -163,6 +164,7 @@ disabled = true
 
 [node name="pod" parent="creature" instance=ExtResource( 6 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14.8223 )
+script = ExtResource( 12 )
 
 [node name="Area" type="Area" parent="creature/pod"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.8223 )
