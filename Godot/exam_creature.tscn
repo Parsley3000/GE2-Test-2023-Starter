@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://FollowPath.gd" type="Script" id=1]
 [ext_resource path="res://SpineAnimator.gd" type="Script" id=2]
@@ -23,6 +23,12 @@
 
 [sub_resource type="BoxShape" id=9]
 
+[sub_resource type="SphereShape" id=17]
+radius = 0.581376
+
+[sub_resource type="SpatialMaterial" id=18]
+albedo_color = Color( 0.917647, 0.0470588, 0.0470588, 0.188235 )
+
 [sub_resource type="CubeMesh" id=1]
 
 [sub_resource type="BoxShape" id=13]
@@ -34,9 +40,6 @@
 [sub_resource type="PrismMesh" id=8]
 
 [sub_resource type="BoxShape" id=10]
-
-[sub_resource type="SphereShape" id=17]
-radius = 0.581376
 
 [sub_resource type="SphereShape" id=15]
 
@@ -117,6 +120,20 @@ weight = 15.0
 draw_gizmos = false
 enabled = false
 
+[node name="pod" parent="creature/boid" instance=ExtResource( 6 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.30688 )
+script = ExtResource( 12 )
+
+[node name="Area" type="Area" parent="creature/boid/pod"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.8223 )
+
+[node name="CollisionShape" type="CollisionShape" parent="creature/boid/pod/Area"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0412713, 0, 14.8223 )
+shape = SubResource( 17 )
+
+[node name="dodecahedron" parent="creature/boid/pod/RootNode" index="0"]
+material/0 = SubResource( 18 )
+
 [node name="body1" type="KinematicBody" parent="creature"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9 )
 
@@ -162,17 +179,6 @@ material/0 = ExtResource( 9 )
 shape = SubResource( 10 )
 disabled = true
 
-[node name="pod" parent="creature" instance=ExtResource( 6 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14.8223 )
-script = ExtResource( 12 )
-
-[node name="Area" type="Area" parent="creature/pod"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.8223 )
-
-[node name="CollisionShape" type="CollisionShape" parent="creature/pod/Area"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0412713, 0, 14.8223 )
-shape = SubResource( 17 )
-
 [node name="Player" type="KinematicBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 44.5051, 11.8629, 4.27246 )
 script = ExtResource( 13 )
@@ -211,6 +217,6 @@ radius = 30
 
 [node name="SceneSwitcher" parent="." instance=ExtResource( 17 )]
 
-[connection signal="body_entered" from="creature/pod/Area" to="creature" method="_on_Area_body_entered"]
+[connection signal="body_entered" from="creature/boid/pod/Area" to="creature" method="_on_Area_body_entered"]
 
-[editable path="creature/pod"]
+[editable path="creature/boid/pod"]
