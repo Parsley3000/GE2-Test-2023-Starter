@@ -1,10 +1,12 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://FollowPath.gd" type="Script" id=1]
 [ext_resource path="res://SpineAnimator.gd" type="Script" id=2]
 [ext_resource path="res://Avoidance.gd" type="Script" id=3]
 [ext_resource path="res://NoiseWander.gd" type="Script" id=4]
 [ext_resource path="res://PlayerSteering.gd" type="Script" id=5]
+[ext_resource path="res://Models/Dodecahedron.fbx" type="PackedScene" id=6]
+[ext_resource path="res://creature.gd" type="Script" id=7]
 [ext_resource path="res://Constrain.gd" type="Script" id=8]
 [ext_resource path="res://Tank Material.tres" type="Material" id=9]
 [ext_resource path="res://Harmonic.gd" type="Script" id=10]
@@ -32,6 +34,9 @@
 
 [sub_resource type="BoxShape" id=10]
 
+[sub_resource type="SphereShape" id=17]
+radius = 0.581376
+
 [sub_resource type="SphereShape" id=15]
 
 [sub_resource type="Environment" id=14]
@@ -49,6 +54,7 @@ _data = {
 script = ExtResource( 14 )
 
 [node name="creature" type="Spatial" parent="."]
+script = ExtResource( 7 )
 
 [node name="spineanimator" type="Node" parent="creature"]
 script = ExtResource( 2 )
@@ -155,6 +161,16 @@ material/0 = ExtResource( 9 )
 shape = SubResource( 10 )
 disabled = true
 
+[node name="Dodecahedron" parent="creature" instance=ExtResource( 6 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14.8223 )
+
+[node name="Area" type="Area" parent="creature/Dodecahedron"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.8223 )
+
+[node name="CollisionShape" type="CollisionShape" parent="creature/Dodecahedron/Area"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0412713, 0, 14.8223 )
+shape = SubResource( 17 )
+
 [node name="Player" type="KinematicBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 44.5051, 11.8629, 4.27246 )
 script = ExtResource( 13 )
@@ -192,3 +208,7 @@ obstacle_scene = ExtResource( 18 )
 radius = 30
 
 [node name="SceneSwitcher" parent="." instance=ExtResource( 17 )]
+
+[connection signal="body_entered" from="creature/Dodecahedron/Area" to="creature" method="_on_Area_body_entered"]
+
+[editable path="creature/Dodecahedron"]
